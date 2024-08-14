@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [todo, setTodo] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("ALL");
 
   const handleAddTodo = function (e) {
     e.preventDefault();
@@ -30,9 +30,9 @@ export default function Home() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
-            <option value="all">All</option>
-            <option value="completed">Completed</option>
-            <option value="uncompleted">Uncompleted</option>
+            <option value="ALL">All</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="UNCOMPLETED">Uncompleted</option>
           </select>
         </div>
       </form>
