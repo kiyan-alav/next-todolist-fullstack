@@ -2,9 +2,11 @@ import {useEffect, useState} from "react";
 import {fetch} from "next/dist/compiled/@edge-runtime/primitives";
 
 export default function Home() {
-    const [todo, setTodo] = useState("");
+    const [title, setTitle] = useState("");
     const [filter, setFilter] = useState("ALL");
     const [todos, setTodos] = useState([])
+    const [singleTodo, setSingleTodo] = useState({})
+    const [isEdit, setIsEdit] = useState(false)
 
     const fetchTodos = async function (selectedFilter = filter) {
         const response = await fetch(`/api/todos?filter=${selectedFilter}`)
@@ -22,7 +24,7 @@ export default function Home() {
     const handleAddTodo = async function (e) {
         e.preventDefault();
         const newTodo = {
-            title: todo,
+            title: title,
             status: false
         }
 
@@ -34,7 +36,7 @@ export default function Home() {
             }
         })
 
-        setTodo("");
+        setTitle("");
         fetchTodos()
 
     };
@@ -44,6 +46,35 @@ export default function Home() {
         if (response.status === 200) {
             fetchTodos()
         }
+    }
+
+    const getSingleTodo = async function (e, todoId) {
+        e.preventDefault();
+        const response = await fetch(`/api/todos/${todoId}`)
+        if (response.status === 200) {
+            const data = response.json()
+            setSingleTodo(data)
+            setTitle(data.title)
+        }
+    }
+
+    const handleEditTodo = async function (todoId) {
+        await fetch(`/api/todos/${todoId}`, {
+            method: "PUT",
+            body: JSON.stringify({
+                title: title
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+
+    }
+
+    const handleDeleteTodo = async function (todoId) {
+        await fetch(`/api/todos/${todoId}`, {
+            method: "DELETE",
+        })
     }
 
     useEffect(() => {
@@ -59,10 +90,16 @@ export default function Home() {
                 <input
                     type="text"
                     className="todo-inputs"
-                    value={todo}
-                    onChange={(e) => setTodo(e.target.value)}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                 />
-                <button className="todo-button" onClick={handleAddTodo}>
+                <button className="todo-button" onClick={() => {
+                    if (isEdit) {
+                        handleEditTodo(singleTodo.id)
+                    } else {
+                        handleAddTodo(e)
+                    }
+                }}>
                     Add
                 </button>
                 <div className="select">
@@ -86,10 +123,13 @@ export default function Home() {
                             <button className="complete-btn" onClick={() => handleCompleteTodo(todo.id)}>
                                 Done
                             </button>
-                            <button className="trash-btn">
+                            <button className="trash-btn" onClick={() => handleDeleteTodo(todo.id)}>
                                 Delete
                             </button>
-                            <button className="edit-btn">
+                            <button className="edit-btn" onClick={() => {
+                                setIsEdit(true)
+                                getSingleTodo(todo.id)
+                            }}>
                                 Edit
                             </button>
                         </div>)
