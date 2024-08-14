@@ -37,6 +37,8 @@ const handler = async function (req, res) {
       const chosenTodo = await todosModel.findOne({ _id: id });
       return res.json(chosenTodo);
     }
+  } else {
+    return res.status(405).json({message: "Method Not Allowed!"});
   }
 };
 

@@ -19,6 +19,8 @@ const handler = async function (req, res) {
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
+  } else {
+    return res.status(405).json({message: "Method Not Allowed!"});
   }
 };
 
