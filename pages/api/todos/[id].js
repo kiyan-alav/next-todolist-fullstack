@@ -1,5 +1,5 @@
 import connectToDb from "@/utils/db";
-import todosModel from "@/models/todos";
+import todosModel from "@/models/todo";
 import { isValidObjectId } from "mongoose";
 
 const handler = async function (req, res) {
@@ -34,11 +34,15 @@ const handler = async function (req, res) {
   } else if (req.method === "GET") {
     const { id } = req.query;
     if (isValidObjectId(id)) {
-      const chosenTodo = await todosModel.findOne({ _id: id });
+      const chosenTodo = await todosModel
+        .findOne({ _id: id })
+        .populate("comments")
+        .populate("user")
+        .lean();
       return res.json(chosenTodo);
     }
   } else {
-    return res.status(405).json({message: "Method Not Allowed!"});
+    return res.status(405).json({ message: "Method Not Allowed!" });
   }
 };
 
